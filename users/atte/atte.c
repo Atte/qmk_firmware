@@ -1,19 +1,3 @@
-/* Copyright 2021 @ Keychron (https://www.keychron.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "atte.h"
 
 //
@@ -22,16 +6,10 @@
 #ifdef UNICODEMAP_ENABLE
 
 const uint32_t unicode_map[NUM_UNICODES] PROGMEM = {
-    [a_UMLAUT] = 0x00E4,
-    [A_UMLAUT] = 0x00C4,
-    [o_UMLAUT] = 0x00F6,
-    [O_UMLAUT] = 0x00D6,
-    [a_RING]   = 0x00E5,
-    [A_RING]   = 0x00C5,
-    [EURO]     = 0x20AC,
+    [a_UMLAUT] = 0x00E4, [A_UMLAUT] = 0x00C4, [o_UMLAUT] = 0x00F6, [O_UMLAUT] = 0x00D6, [a_RING] = 0x00E5, [A_RING] = 0x00C5, [EURO] = 0x20AC,
 };
 
-#ifdef DIP_SWITCH_ENABLE
+#    ifdef DIP_SWITCH_ENABLE
 bool dip_switch_update_user(uint8_t index, bool active) {
     if (index == 0) {
         dprintf("DIP switch status: %d\n", index);
@@ -40,10 +18,9 @@ bool dip_switch_update_user(uint8_t index, bool active) {
     }
     return true;
 }
-#endif // DIP_SWITCH_ENABLE
+#    endif // DIP_SWITCH_ENABLE
 
 #endif // UNICODEMAP_ENABLE
-
 
 //
 // keymap
@@ -71,7 +48,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
-
 
 //
 // leader key
@@ -112,16 +88,16 @@ void leader_end_user(void) {
     } else if (leader_sequence_three_keys(KC_D, KC_B, KC_K)) {
         debug_keyboard = !debug_keyboard;
     }
-#ifdef PERSONAL_EMAIL
+#    ifdef PERSONAL_EMAIL
     else if (leader_sequence_two_keys(KC_P, KC_E)) {
         SEND_STRING(PERSONAL_EMAIL);
     }
-#endif // PERSONAL_EMAIL
-#ifdef WORK_EMAIL
+#    endif // PERSONAL_EMAIL
+#    ifdef WORK_EMAIL
     else if (leader_sequence_two_keys(KC_W, KC_E)) {
         SEND_STRING(WORK_EMAIL);
     }
-#endif // WORK_EMAIL
+#    endif // WORK_EMAIL
 }
 
 #endif // LEADER_ENABLE
