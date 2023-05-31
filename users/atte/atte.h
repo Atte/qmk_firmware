@@ -42,7 +42,7 @@ enum layer_names {
 //
 // lighting
 //
-#ifdef RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_CUSTOM_USER
 
 #define KEY_AZURE       0x99F5FF
 #define KEY_BLACK       0x000000
@@ -64,11 +64,16 @@ enum layer_names {
 #define KEY_WHITE       0xFFFFFF
 #define KEY_YELLOW      0xFFFF00
 
-enum ledlayer_names {
-    LED_CAPS_WORD,
-    NUM_LED_LAYERS
+enum rgb_layer_names {
+    RGB_LAYERS_OFFSET = NUM_LAYERS - 1,
+#ifdef CAPS_WORD_ENABLE
+    CAPS_WORD_LAYER,
+#endif
+    NUM_RGB_LAYERS
 };
 
-extern const uint32_t ledmaps[NUM_LAYERS + NUM_LED_LAYERS][MATRIX_ROWS][MATRIX_COLS] PROGMEM;
+#ifdef CAPS_WORD_ENABLE
+#define RGB_LAYERS_CAPS_WORD CAPS_WORD_LAYER
+#endif // CAPS_WORD_ENABLE
 
-#endif // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_CUSTOM_USER
