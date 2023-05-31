@@ -2,7 +2,7 @@ RGB_MATRIX_EFFECT(RGB_LAYERS)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-extern const uint32_t ledmaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM;
+extern const uint32_t rgbmaps[][MATRIX_ROWS][MATRIX_COLS] PROGMEM;
 
 static bool RGB_LAYERS(effect_params_t* params) {
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
@@ -13,12 +13,17 @@ static bool RGB_LAYERS(effect_params_t* params) {
         layer = RGB_LAYERS_CAPS_WORD;
     }
 #    endif
+#    ifdef RGB_LAYERS_LEADER
+    if (leader_sequence_active()) {
+        layer = RGB_LAYERS_LEADER;
+    }
+#    endif
 
     for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
         for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
             uint8_t led_index = g_led_config.matrix_co[row][col];
             if (led_index >= led_min && led_index < led_max && led_index != NO_LED) {
-                uint32_t color = pgm_read_dword(&ledmaps[layer][row][col]);
+                uint32_t color = pgm_read_dword(&rgbmaps[layer][row][col]);
                 rgb_matrix_set_color(led_index, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
             }
         }

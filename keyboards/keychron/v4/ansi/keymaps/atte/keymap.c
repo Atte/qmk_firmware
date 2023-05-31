@@ -21,7 +21,7 @@ const uint16_t keymaps[NUM_LAYERS][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     ),
 };
 
-const uint32_t ledmaps[NUM_RGB_LAYERS][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
+const uint32_t rgbmaps[NUM_RGB_LAYERS][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
     [BASE] = LAYOUT_ansi_61(
         KEY_WHITE,   KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,
         KEY_WHITE,   KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE,
@@ -45,5 +45,13 @@ const uint32_t ledmaps[NUM_RGB_LAYERS][MATRIX_ROWS][MATRIX_COLS] PROGMEM = {
         KEY_WHITE,   KEY_TEAL,  KEY_TEAL,  KEY_TEAL,  KEY_TEAL,  KEY_TEAL,  KEY_TEAL,  KEY_TEAL,  KEY_RED,   KEY_RED,   KEY_RED,                           KEY_WHITE,
         KEY_WHITE,   KEY_WHITE, KEY_WHITE,                       KEY_WHITE,                                           KEY_PURPLE,  KEY_WHITE,  KEY_WHITE,  KEY_WHITE
     ),
+
+    [LEADER_LAYER] = LAYOUT_ansi_61(
+        KEY_RED,     KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,
+        KEY_RED,     KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,
+        KEY_PURPLE,  KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,                KEY_RED,
+        KEY_RED,     KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,    KEY_RED,                            KEY_RED,
+        KEY_RED,     KEY_RED,    KEY_RED,                            KEY_RED,                                                   KEY_PURPLE,  KEY_RED,    KEY_RED,    KEY_RED
+      ),
 };
 // clang-format on

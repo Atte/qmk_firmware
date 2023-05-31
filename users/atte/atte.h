@@ -53,12 +53,18 @@ enum rgb_layer_names {
     RGB_LAYERS_OFFSET = NUM_LAYERS - 1,
 #    ifdef CAPS_WORD_ENABLE
     CAPS_WORD_LAYER,
-#    endif
+#    endif // CAPS_WORD_ENABLE
+#    ifdef LEADER_ENABLE
+    LEADER_LAYER,
+#    endif // LEADER_ENABLE
     NUM_RGB_LAYERS
 };
 
 #    ifdef CAPS_WORD_ENABLE
 #        define RGB_LAYERS_CAPS_WORD CAPS_WORD_LAYER
 #    endif // CAPS_WORD_ENABLE
+#    ifdef LEADER_ENABLE
+#        define RGB_LAYERS_LEADER LEADER_LAYER
+#    endif // LEADER_ENABLE
 
 #endif // RGB_MATRIX_CUSTOM_USER
