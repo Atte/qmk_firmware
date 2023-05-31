@@ -1,0 +1,160 @@
+/* Copyright 2021 @ Keychron (https://www.keychron.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "atte.h"
+
+//
+// unicode
+//
+#ifdef UNICODEMAP_ENABLE
+
+const uint32_t unicode_map[NUM_UNICODES] PROGMEM = {
+    [a_UMLAUT] = 0x00E4,
+    [A_UMLAUT] = 0x00C4,
+    [o_UMLAUT] = 0x00F6,
+    [O_UMLAUT] = 0x00D6,
+    [a_RING]   = 0x00E5,
+    [A_RING]   = 0x00C5,
+    [EURO]     = 0x20AC,
+};
+
+#ifdef DIP_SWITCH_ENABLE
+bool dip_switch_update_user(uint8_t index, bool active) {
+    if (index == 0) {
+        dprintf("DIP switch status: %d\n", index);
+        set_unicode_input_mode(active ? UNICODE_MODE_WINCOMPOSE : UNICODE_MODE_LINUX);
+        return false;
+    }
+    return true;
+}
+#endif // DIP_SWITCH_ENABLE
+
+#endif // UNICODEMAP_ENABLE
+
+
+//
+// keymap
+//
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+#if defined(LEADER_ENABLE) && defined(ESC_LEAD)
+        case ESC_LEAD:
+            if (record->tap.count) {
+                if (record->event.pressed) {
+                    dprint("ESC lead tap\n");
+                    leader_start();
+                }
+            } else {
+                if (record->event.pressed) {
+                    dprint("ESC lead hold\n");
+                    register_code(KC_ESC)
+                } else {
+                    dprint("ESC lead release\n");
+                    unregister_code(KC_ESC);
+                }
+            }
+            return false;
+#endif
+    }
+    return true;
+}
+
+
+//
+// lighting
+//
+#ifdef RGB_MATRIX_ENABLE
+
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    uint8_t layer = get_highest_layer(layer_state | default_layer_state);
+#ifdef CAPS_WORD_ENABLE
+    if (is_caps_word_on()) {
+        layer = LED_CAPS_WORD;
+    }
+#endif
+
+    for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+        for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+            uint8_t led_index = g_led_config.matrix_co[row][col];
+            if (led_index >= led_min && led_index < led_max && led_index != NO_LED) {
+                uint32_t color = pgm_read_dword(&ledmaps[layer][row][col]);
+                rgb_matrix_set_color(
+                    led_index,
+                    (color >> 16) & 0xFF,
+                    (color >> 8) & 0xFF,
+                    color & 0xFF
+                );
+            }
+        }
+    }
+    return false;
+}
+
+#endif // RGB_MATRIX_ENABLE
+
+
+//
+// leader key
+//
+#ifdef LEADER_ENABLE
+
+void leader_end_user(void) {
+    if (leader_sequence_two_keys(KC_R, KC_B)) {
+        soft_reset_keyboard();
+    } else if (leader_sequence_two_keys(KC_F, KC_L)) {
+        reset_keyboard();
+    } else if (leader_sequence_two_keys(KC_B, KC_L)) {
+        rgb_matrix_toggle();
+    } else if (leader_sequence_two_keys(KC_S, KC_R)) {
+        tap_code16(LALT(KC_PRINT_SCREEN));
+    } else if (leader_sequence_two_keys(KC_P, KC_A)) {
+        tap_code(KC_PAUSE);
+    } else if (leader_sequence_two_keys(KC_S, KC_L)) {
+        tap_code(KC_SCROLL_LOCK);
+    } else if (leader_sequence_two_keys(KC_N, KC_L)) {
+        tap_code(KC_NUM_LOCK);
+    } else if (leader_sequence_two_keys(KC_C, KC_L)) {
+        tap_code(KC_CAPS_LOCK);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_A)) {
+        tap_code(KC_KP_PLUS);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_S)) {
+        tap_code(KC_KP_MINUS);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_M)) {
+        tap_code(KC_KP_ASTERISK);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_D)) {
+        tap_code(KC_KP_SLASH);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_E) || leader_sequence_three_keys(KC_K, KC_P, KC_R)) {
+        tap_code(KC_KP_ENTER);
+    } else if (leader_sequence_two_keys(KC_D, KC_B)) {
+        debug_enable = !debug_enable;
+    } else if (leader_sequence_three_keys(KC_D, KC_B, KC_M)) {
+        debug_matrix = !debug_matrix;
+    } else if (leader_sequence_three_keys(KC_D, KC_B, KC_K)) {
+        debug_keyboard = !debug_keyboard;
+    }
+#ifdef PERSONAL_EMAIL
+    else if (leader_sequence_two_keys(KC_P, KC_E)) {
+        SEND_STRING(PERSONAL_EMAIL);
+    }
+#endif // PERSONAL_EMAIL
+#ifdef WORK_EMAIL
+    else if (leader_sequence_two_keys(KC_W, KC_E)) {
+        SEND_STRING(WORK_EMAIL);
+    }
+#endif // WORK_EMAIL
+}
+
+#endif // LEADER_ENABLE
