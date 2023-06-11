@@ -56,12 +56,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void leader_end_user(void) {
     if (leader_sequence_two_keys(KC_R, KC_B)) {
+#    ifdef RGB_MATRIX_ENABLE
+        rgb_matrix_set_color_all(0xFF, 0x00, 0x00);
+        rgb_matrix_enable_noeeprom();
+#    endif // RGB_MATRIX_ENABLE
         soft_reset_keyboard();
     } else if (leader_sequence_two_keys(KC_F, KC_L)) {
+#    ifdef RGB_MATRIX_ENABLE
+        rgb_matrix_set_color_all(0xFF, 0x00, 0x00);
+        rgb_matrix_enable_noeeprom();
+#    endif // RGB_MATRIX_ENABLE
         reset_keyboard();
-    } else if (leader_sequence_two_keys(KC_B, KC_L)) {
+    }
+#    ifdef RGB_MATRIX_ENABLE
+    else if (leader_sequence_two_keys(KC_B, KC_L)) {
         rgb_matrix_toggle();
-    } else if (leader_sequence_two_keys(KC_S, KC_R)) {
+    }
+#    endif
+    else if (leader_sequence_two_keys(KC_S, KC_R)) {
         tap_code16(LALT(KC_PRINT_SCREEN));
     } else if (leader_sequence_two_keys(KC_P, KC_A)) {
         tap_code(KC_PAUSE);
