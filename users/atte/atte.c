@@ -9,16 +9,20 @@ const uint32_t unicode_map[NUM_UNICODES] PROGMEM = {
     [a_UMLAUT] = 0x00E4, [A_UMLAUT] = 0x00C4, [o_UMLAUT] = 0x00F6, [O_UMLAUT] = 0x00D6, [a_RING] = 0x00E5, [A_RING] = 0x00C5, [EURO] = 0x20AC,
 };
 
-#    ifdef DIP_SWITCH_ENABLE
-bool dip_switch_update_user(uint8_t index, bool active) {
-    if (index == 0) {
-        dprintf("DIP switch status: %d\n", index);
-        set_unicode_input_mode(active ? UNICODE_MODE_WINCOMPOSE : UNICODE_MODE_LINUX);
-        return false;
+#    ifdef OS_DETECTION_ENABLE
+#        include "os_detection.h"
+void housekeeping_task_user(void) {
+    switch (detected_host_os()) {
+        case OS_LINUX:
+            set_unicode_input_mode(UNICODE_MODE_LINUX);
+            break;
+        case OS_WINDOWS:
+        default:
+            set_unicode_input_mode(UNICODE_MODE_WINDOWS);
+            break;
     }
-    return true;
 }
-#    endif // DIP_SWITCH_ENABLE
+#    endif // OS_DETECTION_ENABLE
 
 #endif // UNICODEMAP_ENABLE
 
@@ -50,22 +54,37 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 //
+// RGB
+//
+#ifdef RGB_MATRIX_ENABLE
+void keyboard_post_init_user(void) {
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_DEFAULT_MODE);
+}
+#endif // RGB_MATRIX_ENABLE
+
+#ifdef DIP_SWITCH_ENABLE
+bool dip_switch_update_user(uint8_t index, bool active) {
+    if (index == 0) {
+        if (active) {
+            rgb_matrix_enable_noeeprom();
+        } else {
+            rgb_matrix_disable_noeeprom();
+        }
+        return false;
+    }
+    return true;
+}
+#endif // DIP_SWITCH_ENABLE
+
+//
 // leader key
 //
 #ifdef LEADER_ENABLE
 
 void leader_end_user(void) {
     if (leader_sequence_two_keys(KC_R, KC_B)) {
-#    ifdef RGB_MATRIX_ENABLE
-        rgb_matrix_set_color_all(0xFF, 0x00, 0x00);
-        rgb_matrix_enable_noeeprom();
-#    endif // RGB_MATRIX_ENABLE
         soft_reset_keyboard();
     } else if (leader_sequence_two_keys(KC_F, KC_L)) {
-#    ifdef RGB_MATRIX_ENABLE
-        rgb_matrix_set_color_all(0xFF, 0x00, 0x00);
-        rgb_matrix_enable_noeeprom();
-#    endif // RGB_MATRIX_ENABLE
         reset_keyboard();
     }
 #    ifdef RGB_MATRIX_ENABLE
