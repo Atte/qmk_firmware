@@ -18,7 +18,7 @@ void housekeeping_task_user(void) {
             break;
         case OS_WINDOWS:
         default:
-            set_unicode_input_mode(UNICODE_MODE_WINDOWS);
+            set_unicode_input_mode(UNICODE_MODE_WINCOMPOSE);
             break;
     }
 }
