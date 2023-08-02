@@ -65,11 +65,19 @@ void keyboard_post_init_user(void) {
 #ifdef DIP_SWITCH_ENABLE
 bool dip_switch_update_user(uint8_t index, bool active) {
     if (index == 0) {
+#    if defined(RGB_MATRIX_ENABLE)
         if (active) {
             rgb_matrix_enable_noeeprom();
         } else {
             rgb_matrix_disable_noeeprom();
         }
+#    elif !defined(OS_DETECTION_ENABLE)
+        if (active) {
+            set_unicode_input_mode(UNICODE_MODE_LINUX);
+        } else {
+            set_unicode_input_mode(UNICODE_MODE_WINCOMPOSE);
+        }
+#    endif
         return false;
     }
     return true;
