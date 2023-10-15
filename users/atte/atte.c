@@ -1,5 +1,47 @@
 #include "atte.h"
 
+
+///
+/// help
+///
+static char* HELP_TEXT = R"(
+Dip switch
+----------
+
+Left  = Windows mode
+Right = Linux mode
+
+
+Leader combos
+-------------
+
+BOOT  = Soft reset
+FLASH = Reset to bootloader
+
+LIGHT = Toggle backlight
+
+SYSRQ = SysRq key
+PAUSE = Pause key
+SCRL  = Scroll lock key
+NUML  = Num lock key
+CAPSL = Caps lock key
+
+KPP   = Keypad plus
+KPM   = Keypad minus
+KPT   = Keypad asterisk
+KPD   = Keypad slash
+KPE   = Keypad enter
+
+DEBUG = Toggle debug
+DEBM  = Toggle matrix debug
+DEBK  = Toggle keyboard debug
+
+HELP  = This help text
+
+PE    = Personal email
+WE    = Work email
+)";
+
 //
 // unicode
 //
@@ -90,42 +132,45 @@ bool dip_switch_update_user(uint8_t index, bool active) {
 #ifdef LEADER_ENABLE
 
 void leader_end_user(void) {
-    if (leader_sequence_two_keys(KC_R, KC_B)) {
+    if (leader_sequence_four_keys(KC_B, KC_O, KC_O, KC_T)) {
         soft_reset_keyboard();
-    } else if (leader_sequence_two_keys(KC_F, KC_L)) {
+    } else if (leader_sequence_five_keys(KC_F, KC_L, KC_A, KC_S, KC_H)) {
         reset_keyboard();
     }
 #    ifdef RGB_MATRIX_ENABLE
-    else if (leader_sequence_two_keys(KC_B, KC_L)) {
+    else if (leader_sequence_five_keys(KC_L, KC_I, KC_G, KC_H, KC_T)) {
         rgb_matrix_toggle();
     }
 #    endif
-    else if (leader_sequence_two_keys(KC_S, KC_R)) {
+    else if (leader_sequence_five_keys(KC_S, KC_Y, KC_S, KC_R, KC_Q)) {
         tap_code16(LALT(KC_PRINT_SCREEN));
-    } else if (leader_sequence_two_keys(KC_P, KC_A)) {
+    } else if (leader_sequence_five_keys(KC_P, KC_A, KC_U, KC_S, KC_E)) {
         tap_code(KC_PAUSE);
-    } else if (leader_sequence_two_keys(KC_S, KC_L)) {
+    } else if (leader_sequence_four_keys(KC_S, KC_C, KC_R, KC_L)) {
         tap_code(KC_SCROLL_LOCK);
-    } else if (leader_sequence_two_keys(KC_N, KC_L)) {
+    } else if (leader_sequence_four_keys(KC_N, KC_U, KC_M, KC_L)) {
         tap_code(KC_NUM_LOCK);
-    } else if (leader_sequence_two_keys(KC_C, KC_L)) {
+    } else if (leader_sequence_five_keys(KC_C, KC_A, KC_P, KC_S, KC_L)) {
         tap_code(KC_CAPS_LOCK);
-    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_A)) {
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_P)) {
         tap_code(KC_KP_PLUS);
-    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_S)) {
-        tap_code(KC_KP_MINUS);
     } else if (leader_sequence_three_keys(KC_K, KC_P, KC_M)) {
+        tap_code(KC_KP_MINUS);
+    } else if (leader_sequence_three_keys(KC_K, KC_P, KC_T)) {
         tap_code(KC_KP_ASTERISK);
     } else if (leader_sequence_three_keys(KC_K, KC_P, KC_D)) {
         tap_code(KC_KP_SLASH);
     } else if (leader_sequence_three_keys(KC_K, KC_P, KC_E) || leader_sequence_three_keys(KC_K, KC_P, KC_R)) {
         tap_code(KC_KP_ENTER);
-    } else if (leader_sequence_two_keys(KC_D, KC_B)) {
+    } else if (leader_sequence_five_keys(KC_D, KC_E, KC_B, KC_U, KC_G)) {
         debug_enable = !debug_enable;
-    } else if (leader_sequence_three_keys(KC_D, KC_B, KC_M)) {
+    } else if (leader_sequence_four_keys(KC_D, KC_E, KC_B, KC_M)) {
         debug_matrix = !debug_matrix;
-    } else if (leader_sequence_three_keys(KC_D, KC_B, KC_K)) {
+    } else if (leader_sequence_four_keys(KC_D, KC_E, KC_B, KC_K)) {
         debug_keyboard = !debug_keyboard;
+    }
+    else if (leader_sequence_four_keys(KC_H, KC_E, KC_L, KC_P)) {
+        SEND_STRING(HELP_TEXT);
     }
 #    ifdef PERSONAL_EMAIL
     else if (leader_sequence_two_keys(KC_P, KC_E)) {

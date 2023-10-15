@@ -10,9 +10,9 @@
 
 enum unicode_names { a_UMLAUT, A_UMLAUT, o_UMLAUT, O_UMLAUT, a_RING, A_RING, EURO, NUM_UNICODES };
 
-#    define KC_AUML XP(a_UMLAUT, A_UMLAUT)
-#    define KC_OUML XP(o_UMLAUT, O_UMLAUT)
-#    define KC_ARNG XP(a_RING, A_RING)
+#    define KC_AUML UP(a_UMLAUT, A_UMLAUT)
+#    define KC_OUML UP(o_UMLAUT, O_UMLAUT)
+#    define KC_ARNG UP(a_RING, A_RING)
 
 #endif // UNICODEMAP_ENABLE
 
