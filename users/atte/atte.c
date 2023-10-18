@@ -60,7 +60,7 @@ void housekeeping_task_user(void) {
             break;
         case OS_WINDOWS:
         default:
-            set_unicode_input_mode(UNICODE_MODE_WINCOMPOSE);
+            set_unicode_input_mode(UNICODE_MODE_ALTCODES);
             break;
     }
 }
@@ -117,7 +117,7 @@ bool dip_switch_update_user(uint8_t index, bool active) {
         if (active) {
             set_unicode_input_mode(UNICODE_MODE_LINUX);
         } else {
-            set_unicode_input_mode(UNICODE_MODE_WINCOMPOSE);
+            set_unicode_input_mode(UNICODE_MODE_ALTCODES);
         }
 #    endif
         return false;
