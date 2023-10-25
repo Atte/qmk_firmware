@@ -63,8 +63,17 @@
 #    define UNICODE_TYPE_DELAY 10
 #endif
 
-// The unicode codepoints for Windows-1252 characters 0x80 - 0x9F
-static uint32_t altcodes[] = {0x20ac, 0, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021, 0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0, 0x017d, 0, 0, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014, 0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0, 0x017e, 0x0178};
+// clang-format off
+
+// The Unicode codepoints for Windows-1252 characters 0x80 - 0x9F.
+// All other codepoints are the same as Unicode.
+// Gaps are represented by 0.
+static uint32_t altcodes[] = {
+    0x20ac, 0x0000, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021, 0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0x0000, 0x017d, 0x0000, // 0x80 - 0x8F
+    0x0000, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014, 0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0x0000, 0x017e, 0x0178, // 0x90 - 0x9F
+};
+
+// clang-format on
 
 unicode_config_t unicode_config;
 uint8_t          unicode_saved_mods;
@@ -304,6 +313,7 @@ __attribute__((weak)) void unicode_input_cancel(void) {
             tap_code(KC_ESCAPE);
             break;
         case UNICODE_MODE_WINDOWS:
+        case UNICODE_MODE_ALTCODES:
             unregister_code(KC_LEFT_ALT);
             if (!unicode_saved_led_state.num_lock) {
                 tap_code(KC_NUM_LOCK);
@@ -365,8 +375,7 @@ void register_hex32(uint32_t hex) {
 }
 
 void register_altcode(uint32_t code_point) {
-    // use 0xFFFF as a sentinel value so that 0x00 can still be sent
-    uint16_t altcode = 0xFFFF;
+    uint8_t altcode = 0x00;
 
     if (code_point < 0x80 || (code_point > 0x9F && code_point <= 0xFF)) {
         altcode = code_point;
@@ -379,8 +388,8 @@ void register_altcode(uint32_t code_point) {
         }
     }
 
-    if (altcode == 0xFFFF) {
-        // no altcode matching the character was found
+    if (altcode == 0x00) {
+        // No altcode matching the character was found.
         return;
     }
 

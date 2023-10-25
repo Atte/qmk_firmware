@@ -1,6 +1,5 @@
 #include "atte.h"
 
-
 ///
 /// help
 ///
@@ -19,6 +18,10 @@ BOOT  = Soft reset
 FLASH = Reset to bootloader
 
 LIGHT = Toggle backlight
+
+LINUX = Linux Unicode mode
+WIN   = Windows Unicode mode
+MAC   = MacOS Unicode mode
 
 SYSRQ = SysRq key
 PAUSE = Pause key
@@ -58,9 +61,12 @@ void housekeeping_task_user(void) {
         case OS_LINUX:
             set_unicode_input_mode(UNICODE_MODE_LINUX);
             break;
+        case OS_MACOS:
+            set_unicode_input_mode(UNICODE_MODE_MACOS);
+            break;
         case OS_WINDOWS:
         default:
-            set_unicode_input_mode(UNICODE_MODE_ALTCODES);
+            set_unicode_input_mode(WINDOWS_UNICODE_MODE);
             break;
     }
 }
@@ -71,7 +77,7 @@ void housekeeping_task_user(void) {
 //
 // keymap
 //
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
 #if defined(LEADER_ENABLE) && defined(ESC_LEAD)
         case ESC_LEAD:
@@ -117,7 +123,7 @@ bool dip_switch_update_user(uint8_t index, bool active) {
         if (active) {
             set_unicode_input_mode(UNICODE_MODE_LINUX);
         } else {
-            set_unicode_input_mode(UNICODE_MODE_ALTCODES);
+            set_unicode_input_mode(WINDOWS_UNICODE_MODE);
         }
 #    endif
         return false;
@@ -140,6 +146,15 @@ void leader_end_user(void) {
 #    ifdef RGB_MATRIX_ENABLE
     else if (leader_sequence_five_keys(KC_L, KC_I, KC_G, KC_H, KC_T)) {
         rgb_matrix_toggle();
+    }
+#    endif
+#    ifdef UNICODEMAP_ENABLE
+    else if (leader_sequence_three_keys(KC_L, KC_N, KC_X) || leader_sequence_five_keys(KC_L, KC_I, KC_N, KC_U, KC_X)) {
+        set_unicode_input_mode(UNICODE_MODE_LINUX);
+    } else if (leader_sequence_three_keys(KC_W, KC_I, KC_N)) {
+        set_unicode_input_mode(WINDOWS_UNICODE_MODE);
+    } else if (leader_sequence_three_keys(KC_M, KC_A, KC_C)) {
+        set_unicode_input_mode(UNICODE_MODE_MACOS);
     }
 #    endif
     else if (leader_sequence_five_keys(KC_S, KC_Y, KC_S, KC_R, KC_Q)) {
@@ -168,8 +183,7 @@ void leader_end_user(void) {
         debug_matrix = !debug_matrix;
     } else if (leader_sequence_four_keys(KC_D, KC_E, KC_B, KC_K)) {
         debug_keyboard = !debug_keyboard;
-    }
-    else if (leader_sequence_four_keys(KC_H, KC_E, KC_L, KC_P)) {
+    } else if (leader_sequence_four_keys(KC_H, KC_E, KC_L, KC_P)) {
         SEND_STRING(HELP_TEXT);
     }
 #    ifdef PERSONAL_EMAIL

@@ -118,6 +118,11 @@ void register_hex(uint16_t hex);
  */
 void register_hex32(uint32_t hex);
 
+/**
+ * \brief Input a single Unicode character using Alt codes, if possible.
+ *
+ * \param unicode_code_point The Unicode code point of the character to send.
+ */
 void register_altcode(uint32_t unicode_code_point);
 
 /**
