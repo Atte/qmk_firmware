@@ -54,24 +54,6 @@ const uint32_t unicode_map[NUM_UNICODES] PROGMEM = {
     [a_UMLAUT] = 0x00E4, [A_UMLAUT] = 0x00C4, [o_UMLAUT] = 0x00F6, [O_UMLAUT] = 0x00D6, [a_RING] = 0x00E5, [A_RING] = 0x00C5, [EURO] = 0x20AC,
 };
 
-#    ifdef OS_DETECTION_ENABLE
-#        include "os_detection.h"
-void housekeeping_task_user(void) {
-    switch (detected_host_os()) {
-        case OS_LINUX:
-            set_unicode_input_mode(UNICODE_MODE_LINUX);
-            break;
-        case OS_MACOS:
-            set_unicode_input_mode(UNICODE_MODE_MACOS);
-            break;
-        case OS_WINDOWS:
-        default:
-            set_unicode_input_mode(WINDOWS_UNICODE_MODE);
-            break;
-    }
-}
-#    endif // OS_DETECTION_ENABLE
-
 #endif // UNICODEMAP_ENABLE
 
 //
@@ -107,6 +89,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 #ifdef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_DEFAULT_MODE);
+    set_unicode_input_mode(WINDOWS_UNICODE_MODE);
 }
 #endif // RGB_MATRIX_ENABLE
 
@@ -119,7 +102,7 @@ bool dip_switch_update_user(uint8_t index, bool active) {
         } else {
             rgb_matrix_disable_noeeprom();
         }
-#    elif !defined(OS_DETECTION_ENABLE)
+#    else
         if (active) {
             set_unicode_input_mode(UNICODE_MODE_LINUX);
         } else {
@@ -199,3 +182,39 @@ void leader_end_user(void) {
 }
 
 #endif // LEADER_ENABLE
+
+///
+/// RAW HID
+///
+#ifdef RAW_ENABLE
+
+#   include "raw_hid.h"
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    uint8_t response[length];
+    memset(response, 0, length);
+    response[0] = '0';
+
+    switch (data[0]) {
+        case 'U':
+            switch (data[1]) {
+                case 'L':
+                    set_unicode_input_mode(UNICODE_MODE_LINUX);
+                    response[0] = '1';
+                    break;
+                case 'W':
+                    set_unicode_input_mode(WINDOWS_UNICODE_MODE);
+                    response[0] = '1';
+                    break;
+                case 'M':
+                    set_unicode_input_mode(UNICODE_MODE_MACOS);
+                    response[0] = '1';
+                    break;
+            }
+            break;
+    }
+
+    raw_hid_send(response, length);
+}
+
+#endif // RAW_ENABLE
