@@ -96,19 +96,11 @@ void keyboard_post_init_user(void) {
 #ifdef DIP_SWITCH_ENABLE
 bool dip_switch_update_user(uint8_t index, bool active) {
     if (index == 0) {
-#    if defined(RGB_MATRIX_ENABLE)
-        if (active) {
-            rgb_matrix_enable_noeeprom();
-        } else {
-            rgb_matrix_disable_noeeprom();
-        }
-#    else
         if (active) {
             set_unicode_input_mode(UNICODE_MODE_LINUX);
         } else {
             set_unicode_input_mode(WINDOWS_UNICODE_MODE);
         }
-#    endif
         return false;
     }
     return true;
@@ -132,6 +124,7 @@ void leader_end_user(void) {
     }
 #    endif
 #    ifdef UNICODEMAP_ENABLE
+#    ifndef DIP_SWITCH_ENABLE
     else if (leader_sequence_three_keys(KC_L, KC_N, KC_X) || leader_sequence_five_keys(KC_L, KC_I, KC_N, KC_U, KC_X)) {
         set_unicode_input_mode(UNICODE_MODE_LINUX);
     } else if (leader_sequence_three_keys(KC_W, KC_I, KC_N)) {
@@ -139,6 +132,7 @@ void leader_end_user(void) {
     } else if (leader_sequence_three_keys(KC_M, KC_A, KC_C)) {
         set_unicode_input_mode(UNICODE_MODE_MACOS);
     }
+#    endif
 #    endif
     else if (leader_sequence_five_keys(KC_S, KC_Y, KC_S, KC_R, KC_Q)) {
         tap_code16(LALT(KC_PRINT_SCREEN));
@@ -193,22 +187,26 @@ void leader_end_user(void) {
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     uint8_t response[length];
     memset(response, 0, length);
-    response[0] = '0';
+    response[0] = data[0];
 
     switch (data[0]) {
-        case 'U':
+        // read status
+        case 'R':
+            response[1] = data[1];
             switch (data[1]) {
-                case 'L':
-                    set_unicode_input_mode(UNICODE_MODE_LINUX);
-                    response[0] = '1';
-                    break;
-                case 'W':
-                    set_unicode_input_mode(WINDOWS_UNICODE_MODE);
-                    response[0] = '1';
-                    break;
-                case 'M':
-                    set_unicode_input_mode(UNICODE_MODE_MACOS);
-                    response[0] = '1';
+                // unicode mode
+                case 'U':
+                    switch (get_unicode_input_mode()) {
+                        case UNICODE_MODE_LINUX:
+                            response[2] = 'L';
+                            break;
+                        case WINDOWS_UNICODE_MODE:
+                            response[2] = 'W';
+                            break;
+                        case UNICODE_MODE_MACOS:
+                            response[2] = 'M';
+                            break;
+                    }
                     break;
             }
             break;
